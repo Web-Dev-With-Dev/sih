@@ -324,24 +324,60 @@ export default function Dashboard() {
           <div className="flex items-center mb-4">
             <Calendar className="text-primary mr-3 h-6 w-6" />
             <h2 className="text-xl font-bold text-foreground" data-testid="text-upcoming-title">
-              Upcoming Phases
+              SIH 2025 Phases
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-card p-4 rounded-lg border border-accent border-2" data-testid="card-current-phase">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-foreground">Problem Statement Choose & Register</h3>
+                <div className="px-2 py-1 bg-accent/10 text-accent rounded text-xs font-medium">
+                  Current Phase
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-2">Select your problem statement and complete team registration</p>
+              <div className="text-xs text-accent font-medium">
+                <Calendar className="mr-1 h-3 w-3 inline" />
+                Registration Deadline: September 19, 2025
+              </div>
+            </div>
             <div className="bg-card p-4 rounded-lg border border-border" data-testid="card-upcoming-solution">
-              <h3 className="font-semibold text-foreground mb-2">Solution Development Phase</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-foreground">Solution Development Phase</h3>
+                <div className="px-2 py-1 bg-muted text-muted-foreground rounded text-xs font-medium">
+                  Upcoming
+                </div>
+              </div>
               <p className="text-sm text-muted-foreground mb-2">Technical implementation and prototype development</p>
               <div className="text-xs text-muted-foreground">
                 <Calendar className="mr-1 h-3 w-3 inline" />
-                Expected Start: Jan 2, 2025
+                Coming Soon
               </div>
             </div>
             <div className="bg-card p-4 rounded-lg border border-border" data-testid="card-upcoming-testing">
-              <h3 className="font-semibold text-foreground mb-2">Testing & Refinement</h3>
-              <p className="text-sm text-muted-foreground mb-2">Quality assurance and final adjustments</p>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-foreground">Internal Hackathon</h3>
+                <div className="px-2 py-1 bg-muted text-muted-foreground rounded text-xs font-medium">
+                  Upcoming
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-2">Internal evaluation and selection process</p>
               <div className="text-xs text-muted-foreground">
                 <Calendar className="mr-1 h-3 w-3 inline" />
-                Expected Start: Jan 15, 2025
+                Coming Soon
+              </div>
+            </div>
+            <div className="bg-card p-4 rounded-lg border border-border" data-testid="card-upcoming-final">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-foreground">Grand Finale</h3>
+                <div className="px-2 py-1 bg-muted text-muted-foreground rounded text-xs font-medium">
+                  Upcoming
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-2">Final presentation and judging at national level</p>
+              <div className="text-xs text-muted-foreground">
+                <Calendar className="mr-1 h-3 w-3 inline" />
+                Coming Soon
               </div>
             </div>
           </div>
