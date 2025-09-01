@@ -2,6 +2,7 @@ import { Trophy, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import sihLogo from "@assets/generated_images/Smart_India_Hackathon_logo_728ee237.png";
+import ThemeToggle from "./theme-toggle";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,36 +29,39 @@ export default function Header() {
               </div>
             </div>
           </div>
-          <nav className="hidden md:flex space-x-6">
-            <a 
-              href="#dashboard" 
-              className="text-primary font-medium hover:text-primary/80 transition-colors"
-              data-testid="nav-dashboard"
-            >
-              Dashboard
-            </a>
-            <a 
-              href="#team" 
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              data-testid="nav-team"
-            >
-              Team
-            </a>
-            <a 
-              href="#tasks" 
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              data-testid="nav-tasks"
-            >
-              Tasks
-            </a>
-            <a 
-              href="#uploads" 
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              data-testid="nav-uploads"
-            >
-              Uploads
-            </a>
-          </nav>
+          <div className="flex items-center space-x-4">
+            <nav className="hidden md:flex space-x-6">
+              <a 
+                href="#dashboard" 
+                className="text-primary font-medium hover:text-primary/80 transition-colors"
+                data-testid="nav-dashboard"
+              >
+                Dashboard
+              </a>
+              <a 
+                href="#team" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="nav-team"
+              >
+                Team
+              </a>
+              <a 
+                href="#tasks" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="nav-tasks"
+              >
+                Tasks
+              </a>
+              <a 
+                href="#uploads" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="nav-uploads"
+              >
+                Uploads
+              </a>
+            </nav>
+            <ThemeToggle />
+          </div>
           <Button
             variant="ghost"
             size="sm"

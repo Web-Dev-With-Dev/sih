@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 import type { TeamMember } from "@shared/schema";
 
 interface TeamMemberCardProps {
@@ -85,7 +86,14 @@ export default function TeamMemberCard({
   };
 
   return (
-    <div className="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow" data-testid={`card-member-${member.name.toLowerCase()}`}>
+    <motion.div 
+      className="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow" 
+      data-testid={`card-member-${member.name.toLowerCase()}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+    >
       <div className="flex items-center mb-4">
         <div className={`w-12 h-12 avatar-${member.color} rounded-full flex items-center justify-center font-semibold text-lg`} data-testid={`avatar-${member.name.toLowerCase()}`}>
           {member.avatar}
@@ -163,6 +171,6 @@ export default function TeamMemberCard({
           </span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

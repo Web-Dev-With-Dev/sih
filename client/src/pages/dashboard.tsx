@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, TrendingUp, Calendar } from "lucide-react";
+import { Plus, TrendingUp, Calendar, Users, CheckCircle, Clock, Filter } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -17,6 +18,8 @@ import ProgressCard from "@/components/progress-card";
 import TeamMemberCard from "@/components/team-member-card";
 import TaskCard from "@/components/task-card";
 import FileUpload from "@/components/file-upload";
+import ActivityFeed from "@/components/activity-feed";
+import StatsCard from "@/components/stats-card";
 import { z } from "zod";
 
 const taskFormSchema = insertTaskSchema.extend({
@@ -28,6 +31,7 @@ type TaskFormData = z.infer<typeof taskFormSchema>;
 
 export default function Dashboard() {
   const [addTaskOpen, setAddTaskOpen] = useState(false);
+  const [taskFilter, setTaskFilter] = useState<"all" | "pending" | "in-progress" | "completed">("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -82,6 +86,12 @@ export default function Dashboard() {
     createTaskMutation.mutate(data);
   };
 
+  // Filter tasks based on selected filter
+  const filteredTasks = tasks.filter(task => {
+    if (taskFilter === "all") return true;
+    return task.status === taskFilter;
+  });
+
   // Calculate statistics
   const problemRecognitionTasks = tasks.filter(task => task.category === "problem-recognition");
   const problemRecognitionProgress = problemRecognitionTasks.length > 0 
@@ -94,6 +104,10 @@ export default function Dashboard() {
     : 0;
 
   const completedTasks = tasks.filter(task => task.status === "completed").length;
+  const inProgressTasks = tasks.filter(task => task.status === "in-progress").length;
+  const pendingTasks = tasks.filter(task => task.status === "pending").length;
+  const totalTasks = tasks.length;
+  const membersWithRoles = teamMembers.filter(member => member.role && member.role.trim() !== "").length;
 
   // Get member statistics
   const getMemberStats = (memberName: string) => {
@@ -119,7 +133,14 @@ export default function Dashboard() {
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
-            <p className="text-muted-foreground" data-testid="loading-dashboard">Loading dashboard...</p>
+            <motion.p 
+              className="text-muted-foreground" 
+              data-testid="loading-dashboard"
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              Loading dashboard...
+            </motion.p>
           </div>
         </div>
       </div>
@@ -127,7 +148,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div 
+      className="min-h-screen bg-background"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -231,6 +257,38 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <StatsCard
+              title="Total Tasks"
+              value={totalTasks}
+              description="All project tasks"
+              icon={Calendar}
+              color="primary"
+            />
+            <StatsCard
+              title="Completed"
+              value={completedTasks}
+              description="Finished tasks"
+              icon={CheckCircle}
+              color="secondary"
+            />
+            <StatsCard
+              title="In Progress"
+              value={inProgressTasks}
+              description="Active tasks"
+              icon={Clock}
+              color="accent"
+            />
+            <StatsCard
+              title="Team Members"
+              value={`${membersWithRoles}/6`}
+              description="With assigned roles"
+              icon={Users}
+              color="muted"
+            />
+          </div>
+
           {/* Progress Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <ProgressCard
@@ -270,54 +328,106 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamMembers.map((member) => {
+            {teamMembers.map((member, index) => {
               const stats = getMemberStats(member.name);
               return (
-                <TeamMemberCard
+                <motion.div
                   key={member.id}
-                  member={member}
-                  problemStatementStatus={stats.problemStatementStatus}
-                  tasksAssigned={stats.tasksAssigned}
-                  tasksCompleted={stats.tasksCompleted}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <TeamMemberCard
+                    member={member}
+                    problemStatementStatus={stats.problemStatementStatus}
+                    tasksAssigned={stats.tasksAssigned}
+                    tasksCompleted={stats.tasksCompleted}
+                  />
+                </motion.div>
               );
             })}
           </div>
         </section>
 
-        {/* Tasks & File Upload Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Tasks & Activity Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Task Management */}
-          <section id="tasks">
-            <h2 className="text-2xl font-bold text-foreground mb-6" data-testid="text-tasks-title">
-              Current Tasks
-            </h2>
+          <section id="tasks" className="lg:col-span-2">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-foreground" data-testid="text-tasks-title">
+                Current Tasks
+              </h2>
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select value={taskFilter} onValueChange={(value: any) => setTaskFilter(value)}>
+                  <SelectTrigger className="w-32" data-testid="task-filter">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tasks</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in-progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             
             <div className="space-y-4">
-              {tasks.length === 0 ? (
-                <div className="text-center py-8" data-testid="empty-tasks">
-                  <p className="text-muted-foreground">No tasks yet. Create your first task!</p>
-                </div>
-              ) : (
-                tasks.map((task) => (
-                  <TaskCard key={task.id} task={task} />
-                ))
-              )}
+              <AnimatePresence mode="wait">
+                {filteredTasks.length === 0 ? (
+                  <motion.div 
+                    className="text-center py-8" 
+                    data-testid="empty-tasks"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                  >
+                    <p className="text-muted-foreground">
+                      {taskFilter === "all" ? "No tasks yet. Create your first task!" : `No ${taskFilter} tasks found.`}
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {filteredTasks.map((task, index) => (
+                      <motion.div
+                        key={task.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <TaskCard task={task} />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              <button 
+              <motion.button 
                 className="w-full mt-4 border-2 border-dashed border-border rounded-lg p-4 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                 onClick={() => setAddTaskOpen(true)}
                 data-testid="button-add-task-inline"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
               >
                 <Plus className="mr-2 h-4 w-4 inline" />
                 Add New Task
-              </button>
+              </motion.button>
             </div>
           </section>
 
-          {/* File Upload Section */}
-          <FileUpload />
+          {/* Activity Feed */}
+          <ActivityFeed />
         </div>
+
+        {/* File Upload Section */}
+        <section className="mb-8">
+          <FileUpload />
+        </section>
 
         {/* Upcoming Tasks Preview */}
         <section className="mt-8 bg-muted/50 rounded-lg p-6">
@@ -383,6 +493,6 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
-    </div>
+    </motion.div>
   );
 }
