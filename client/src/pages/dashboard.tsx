@@ -178,7 +178,8 @@ export default function Dashboard() {
                     Add Task
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent aria-describedby="dialog-desc" className="max-w-md">
+                  <div id="dialog-desc">Describe what this dialog does here.</div>
                   <DialogHeader>
                     <DialogTitle>Create New Task</DialogTitle>
                   </DialogHeader>
