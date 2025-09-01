@@ -1,6 +1,7 @@
 import { Trophy, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import sihLogo from "@assets/generated_images/Smart_India_Hackathon_logo_728ee237.png";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -11,7 +12,12 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
-              <Trophy className="text-accent text-2xl mr-3 h-8 w-8" />
+              <img 
+                src={sihLogo} 
+                alt="Smart India Hackathon Logo" 
+                className="h-12 w-auto mr-3"
+                data-testid="sih-logo"
+              />
               <div>
                 <h1 className="text-xl font-bold text-foreground" data-testid="header-title">
                   Smart India Hackathon 2025
