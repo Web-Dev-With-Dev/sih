@@ -1,136 +1,90 @@
+import { MongoClient, ObjectId } from "mongodb";
 import { type TeamMember, type InsertTeamMember, type Task, type InsertTask, type Upload, type InsertUpload } from "@shared/schema";
-import { randomUUID } from "crypto";
 
-export interface IStorage {
-  // Team Members
-  getTeamMembers(): Promise<TeamMember[]>;
-  getTeamMember(id: string): Promise<TeamMember | undefined>;
-  createTeamMember(member: InsertTeamMember): Promise<TeamMember>;
-  updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember>;
+const uri = process.env.MONGODB_URI || "mongodb://localhost:27017";
+const client = new MongoClient(uri);
+const dbName = "taskmaster";
 
-  // Tasks
-  getTasks(): Promise<Task[]>;
-  getTask(id: string): Promise<Task | undefined>;
-  createTask(task: InsertTask): Promise<Task>;
-  updateTask(id: string, updates: Partial<Task>): Promise<Task>;
-  deleteTask(id: string): Promise<boolean>;
-
-  // Uploads
-  getUploads(): Promise<Upload[]>;
-  getUpload(id: string): Promise<Upload | undefined>;
-  createUpload(upload: InsertUpload): Promise<Upload>;
-  deleteUpload(id: string): Promise<boolean>;
-}
-
-export class MemStorage implements IStorage {
-  private teamMembers: Map<string, TeamMember>;
-  private tasks: Map<string, Task>;
-  private uploads: Map<string, Upload>;
-
-  constructor() {
-    this.teamMembers = new Map();
-    this.tasks = new Map();
-    this.uploads = new Map();
-    this.initializeData();
-  }
-
-  private initializeData() {
-    // Initialize team members with no default roles
-    const members = [
-      { name: "Dev", role: "", avatar: "D", color: "primary" },
-      { name: "Krisha", role: "", avatar: "K", color: "secondary" },
-      { name: "Dhruvi", role: "", avatar: "D", color: "accent" },
-      { name: "Keval", role: "", avatar: "K", color: "primary" },
-      { name: "Param", role: "", avatar: "P", color: "secondary" },
-      { name: "Vivek", role: "", avatar: "V", color: "muted" },
-    ];
-
-    members.forEach(member => {
-      const id = randomUUID();
-      this.teamMembers.set(id, { ...member, id });
-    });
-  }
+export class MongoStorage {
+  private dbPromise = client.connect().then(c => c.db(dbName));
 
   // Team Members
   async getTeamMembers(): Promise<TeamMember[]> {
-    return Array.from(this.teamMembers.values());
+    const db = await this.dbPromise;
+    return db.collection<TeamMember>("teamMembers").find().toArray();
   }
 
   async getTeamMember(id: string): Promise<TeamMember | undefined> {
-    return this.teamMembers.get(id);
+    const db = await this.dbPromise;
+    return db.collection<TeamMember>("teamMembers").findOne({ _id: new ObjectId(id) }) ?? undefined;
   }
 
-  async createTeamMember(insertMember: InsertTeamMember): Promise<TeamMember> {
-    const id = randomUUID();
-    const member: TeamMember = { ...insertMember, id };
-    this.teamMembers.set(id, member);
-    return member;
+  async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
+    const db = await this.dbPromise;
+    const result = await db.collection("teamMembers").insertOne(member);
+    return { ...member, id: result.insertedId.toString() };
   }
 
   async updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember> {
-    const existingMember = this.teamMembers.get(id);
-    if (!existingMember) {
-      throw new Error("Team member not found");
-    }
-    const updatedMember = { ...existingMember, ...updates };
-    this.teamMembers.set(id, updatedMember);
-    return updatedMember;
+    const db = await this.dbPromise;
+    await db.collection("teamMembers").updateOne({ _id: new ObjectId(id) }, { $set: updates });
+    return (await this.getTeamMember(id))!;
   }
 
   // Tasks
   async getTasks(): Promise<Task[]> {
-    return Array.from(this.tasks.values());
+    const db = await this.dbPromise;
+    return db.collection<Task>("tasks").find().toArray();
   }
 
   async getTask(id: string): Promise<Task | undefined> {
-    return this.tasks.get(id);
+    const db = await this.dbPromise;
+    return db.collection<Task>("tasks").findOne({ _id: new ObjectId(id) }) ?? undefined;
   }
 
-  async createTask(insertTask: InsertTask): Promise<Task> {
-    const id = randomUUID();
-    const task: Task = { 
-      ...insertTask, 
-      id, 
-      createdAt: new Date(),
-      progress: insertTask.progress ?? 0
-    };
-    this.tasks.set(id, task);
-    return task;
+  async createTask(task: InsertTask): Promise<Task> {
+    const db = await this.dbPromise;
+    const doc = { ...task, createdAt: new Date(), progress: task.progress ?? 0 };
+    const result = await db.collection("tasks").insertOne(doc);
+    return { ...doc, id: result.insertedId.toString() };
   }
 
   async updateTask(id: string, updates: Partial<Task>): Promise<Task> {
-    const existingTask = this.tasks.get(id);
-    if (!existingTask) {
-      throw new Error("Task not found");
-    }
-    const updatedTask = { ...existingTask, ...updates };
-    this.tasks.set(id, updatedTask);
-    return updatedTask;
+    const db = await this.dbPromise;
+    await db.collection("tasks").updateOne({ _id: new ObjectId(id) }, { $set: updates });
+    return (await this.getTask(id))!;
   }
 
   async deleteTask(id: string): Promise<boolean> {
-    return this.tasks.delete(id);
+    const db = await this.dbPromise;
+    const result = await db.collection("tasks").deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount === 1;
   }
 
   // Uploads
   async getUploads(): Promise<Upload[]> {
-    return Array.from(this.uploads.values());
+    const db = await this.dbPromise;
+    return db.collection<Upload>("uploads").find().toArray();
   }
 
   async getUpload(id: string): Promise<Upload | undefined> {
-    return this.uploads.get(id);
+    const db = await this.dbPromise;
+    return db.collection<Upload>("uploads").findOne({ _id: new ObjectId(id) }) ?? undefined;
   }
 
-  async createUpload(insertUpload: InsertUpload): Promise<Upload> {
-    const id = randomUUID();
-    const upload: Upload = { ...insertUpload, id, uploadedAt: new Date() };
-    this.uploads.set(id, upload);
-    return upload;
+  async createUpload(upload: InsertUpload): Promise<Upload> {
+    const db = await this.dbPromise;
+    const doc = { ...upload, uploadedAt: new Date() };
+    const result = await db.collection("uploads").insertOne(doc);
+    return { ...doc, id: result.insertedId.toString() };
   }
 
   async deleteUpload(id: string): Promise<boolean> {
-    return this.uploads.delete(id);
+    const db = await this.dbPromise;
+    const result = await db.collection("uploads").deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount === 1;
   }
 }
 
-export const storage = new MemStorage();
+// Use MongoStorage instead of MemStorage
+export const storage = new MongoStorage();
