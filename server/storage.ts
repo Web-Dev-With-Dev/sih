@@ -6,6 +6,7 @@ export interface IStorage {
   getTeamMembers(): Promise<TeamMember[]>;
   getTeamMember(id: string): Promise<TeamMember | undefined>;
   createTeamMember(member: InsertTeamMember): Promise<TeamMember>;
+  updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember>;
 
   // Tasks
   getTasks(): Promise<Task[]>;
@@ -34,85 +35,19 @@ export class MemStorage implements IStorage {
   }
 
   private initializeData() {
-    // Initialize team members
+    // Initialize team members with no default roles
     const members = [
-      { name: "Dev", role: "Team Lead & Developer", avatar: "D", color: "primary" },
-      { name: "Krisha", role: "UI/UX Designer", avatar: "K", color: "secondary" },
-      { name: "Dhruvi", role: "Backend Developer", avatar: "D", color: "accent" },
-      { name: "Keval", role: "Frontend Developer", avatar: "K", color: "primary" },
-      { name: "Param", role: "Data Analyst", avatar: "P", color: "secondary" },
-      { name: "Mysterious", role: "Role TBD", avatar: "?", color: "muted" },
+      { name: "Dev", role: "", avatar: "D", color: "primary" },
+      { name: "Krisha", role: "", avatar: "K", color: "secondary" },
+      { name: "Dhruvi", role: "", avatar: "D", color: "accent" },
+      { name: "Keval", role: "", avatar: "K", color: "primary" },
+      { name: "Param", role: "", avatar: "P", color: "secondary" },
+      { name: "Mysterious", role: "", avatar: "?", color: "muted" },
     ];
 
     members.forEach(member => {
       const id = randomUUID();
       this.teamMembers.set(id, { ...member, id });
-    });
-
-    // Initialize some sample tasks
-    const sampleTasks = [
-      {
-        title: "Problem Statement Research",
-        description: "Research and identify key problem areas for our hackathon solution",
-        assignees: ["Dev", "Krisha"],
-        status: "in-progress",
-        category: "problem-recognition",
-        progress: 75,
-        dueDate: "2024-12-28"
-      },
-      {
-        title: "UI Wireframe Creation",
-        description: "Create initial wireframes for the user interface design",
-        assignees: ["Krisha"],
-        status: "completed",
-        category: "problem-recognition",
-        progress: 100,
-        dueDate: "2024-12-25"
-      },
-      {
-        title: "Database Schema Design",
-        description: "Design the database structure for the application",
-        assignees: ["Dhruvi", "Keval"],
-        status: "pending",
-        category: "solution-development",
-        progress: 0,
-        dueDate: "2024-12-30"
-      }
-    ];
-
-    sampleTasks.forEach(task => {
-      const id = randomUUID();
-      this.tasks.set(id, { ...task, id, createdAt: new Date() });
-    });
-
-    // Initialize some sample uploads
-    const sampleUploads = [
-      {
-        filename: "problem_statement_dev.pdf",
-        originalName: "problem_statement_dev.pdf",
-        memberName: "Dev",
-        fileSize: 2400000,
-        fileType: "application/pdf"
-      },
-      {
-        filename: "problem_analysis_krisha.docx",
-        originalName: "problem_analysis_krisha.docx",
-        memberName: "Krisha",
-        fileSize: 1800000,
-        fileType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      },
-      {
-        filename: "market_research_keval.pdf",
-        originalName: "market_research_keval.pdf",
-        memberName: "Keval",
-        fileSize: 3100000,
-        fileType: "application/pdf"
-      }
-    ];
-
-    sampleUploads.forEach(upload => {
-      const id = randomUUID();
-      this.uploads.set(id, { ...upload, id, uploadedAt: new Date() });
     });
   }
 
@@ -130,6 +65,16 @@ export class MemStorage implements IStorage {
     const member: TeamMember = { ...insertMember, id };
     this.teamMembers.set(id, member);
     return member;
+  }
+
+  async updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember> {
+    const existingMember = this.teamMembers.get(id);
+    if (!existingMember) {
+      throw new Error("Team member not found");
+    }
+    const updatedMember = { ...existingMember, ...updates };
+    this.teamMembers.set(id, updatedMember);
+    return updatedMember;
   }
 
   // Tasks

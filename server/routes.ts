@@ -49,6 +49,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/team-members/:id", async (req, res) => {
+    try {
+      const updates = req.body;
+      const member = await storage.updateTeamMember(req.params.id, updates);
+      res.json(member);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Team member not found") {
+        res.status(404).json({ message: "Team member not found" });
+      } else {
+        res.status(500).json({ message: "Failed to update team member" });
+      }
+    }
+  });
+
   // Tasks Routes
   app.get("/api/tasks", async (req, res) => {
     try {

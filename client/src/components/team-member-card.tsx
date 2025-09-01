@@ -1,3 +1,10 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Edit, Check, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { TeamMember } from "@shared/schema";
 
 interface TeamMemberCardProps {
@@ -13,6 +20,46 @@ export default function TeamMemberCard({
   tasksAssigned, 
   tasksCompleted 
 }: TeamMemberCardProps) {
+  const [isEditingRole, setIsEditingRole] = useState(false);
+  const [newRole, setNewRole] = useState(member.role);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const updateMemberMutation = useMutation({
+    mutationFn: async (updates: Partial<TeamMember>) => {
+      const response = await apiRequest("PATCH", `/api/team-members/${member.id}`, updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
+      setIsEditingRole(false);
+      toast({
+        title: "Success",
+        description: "Role updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      setNewRole(member.role); // Reset to original value
+    },
+  });
+
+  const handleSaveRole = () => {
+    if (newRole.trim() !== member.role) {
+      updateMemberMutation.mutate({ role: newRole.trim() });
+    } else {
+      setIsEditingRole(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setNewRole(member.role);
+    setIsEditingRole(false);
+  };
   const getStatusColor = (status: string) => {
     switch (status) {
       case "submitted":
@@ -43,13 +90,57 @@ export default function TeamMemberCard({
         <div className={`w-12 h-12 avatar-${member.color} rounded-full flex items-center justify-center font-semibold text-lg`} data-testid={`avatar-${member.name.toLowerCase()}`}>
           {member.avatar}
         </div>
-        <div className="ml-4">
+        <div className="ml-4 flex-1">
           <h3 className="font-semibold text-foreground" data-testid={`text-name-${member.name.toLowerCase()}`}>
             {member.name}
           </h3>
-          <p className="text-sm text-muted-foreground" data-testid={`text-role-${member.name.toLowerCase()}`}>
-            {member.role}
-          </p>
+          <div className="flex items-center space-x-2">
+            {isEditingRole ? (
+              <div className="flex items-center space-x-1">
+                <Input
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value)}
+                  placeholder="Enter role"
+                  className="text-sm h-7 w-32"
+                  data-testid={`input-role-${member.name.toLowerCase()}`}
+                />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleSaveRole}
+                  disabled={updateMemberMutation.isPending}
+                  className="h-7 w-7 p-0"
+                  data-testid={`button-save-role-${member.name.toLowerCase()}`}
+                >
+                  <Check className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCancelEdit}
+                  className="h-7 w-7 p-0"
+                  data-testid={`button-cancel-role-${member.name.toLowerCase()}`}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-muted-foreground" data-testid={`text-role-${member.name.toLowerCase()}`}>
+                  {member.role || "No role assigned"}
+                </p>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setIsEditingRole(true)}
+                  className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                  data-testid={`button-edit-role-${member.name.toLowerCase()}`}
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className="space-y-3">
