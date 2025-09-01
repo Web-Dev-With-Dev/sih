@@ -1,0 +1,640 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart India Hackathon 2025 - Team Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                }
+            },
+            fontFamily: {
+                sans: ["Inter", "system-ui", "sans-serif"],
+            }
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(222.2 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222.2 84% 4.9%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(222.2 84% 4.9%);
+            --primary: hsl(221.2 83.2% 53.3%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(142.1 76.2% 36.3%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(24.6 95% 53.1%);
+            --accent-foreground: hsl(210 40% 98%);
+            --destructive: hsl(0 84.2% 60.2%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --input: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(221.2 83.2% 53.3%);
+            --radius: 0.75rem;
+        }
+        
+        .drag-over {
+            border-color: hsl(var(--primary));
+            background-color: hsl(var(--primary) / 0.05);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-background text-foreground font-sans">
+    <!-- Header -->
+    <header class="bg-card border-b border-border sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-trophy text-accent text-2xl mr-3"></i>
+                        <div>
+                            <h1 class="text-xl font-bold text-foreground">Smart India Hackathon 2025</h1>
+                            <p class="text-sm text-muted-foreground">Team Management Dashboard</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#dashboard" class="text-primary font-medium hover:text-primary/80 transition-colors">Dashboard</a>
+                    <a href="#team" class="text-muted-foreground hover:text-foreground transition-colors">Team</a>
+                    <a href="#tasks" class="text-muted-foreground hover:text-foreground transition-colors">Tasks</a>
+                    <a href="#uploads" class="text-muted-foreground hover:text-foreground transition-colors">Uploads</a>
+                </nav>
+                <button class="md:hidden p-2 rounded-md hover:bg-muted">
+                    <i class="fas fa-bars text-foreground"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Overview -->
+        <section id="dashboard" class="mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-foreground">Team Dashboard</h2>
+                    <p class="text-muted-foreground mt-1">Track progress and manage your hackathon team</p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex space-x-3">
+                    <button class="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add Task
+                    </button>
+                    <button class="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg hover:bg-secondary/90 transition-colors">
+                        <i class="fas fa-upload mr-2"></i>Upload Files
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-foreground">Problem Recognition</h3>
+                        <div class="bg-accent/10 text-accent px-3 py-1 rounded-full text-sm font-medium">
+                            In Progress
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-muted-foreground">Progress</span>
+                            <span class="font-medium">75%</span>
+                        </div>
+                        <div class="w-full bg-muted rounded-full h-2">
+                            <div class="bg-accent h-2 rounded-full w-3/4"></div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-muted-foreground">4 out of 6 members have submitted their problem statements</p>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-foreground">Solution Development</h3>
+                        <div class="bg-muted text-muted-foreground px-3 py-1 rounded-full text-sm font-medium">
+                            Pending
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-muted-foreground">Progress</span>
+                            <span class="font-medium">0%</span>
+                        </div>
+                        <div class="w-full bg-muted rounded-full h-2">
+                            <div class="bg-muted h-2 rounded-full w-0"></div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-muted-foreground">Waiting for problem recognition phase to complete</p>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-foreground">Team Activity</h3>
+                        <i class="fas fa-chart-line text-secondary"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-foreground mb-2">24</div>
+                    <p class="text-sm text-muted-foreground">Tasks completed this week</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Members Section -->
+        <section id="team" class="mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-foreground">Team Members</h2>
+                <span class="text-muted-foreground">6 members</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- @COMPONENT: MemberCard [member data] -->
+                <div class="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg">
+                            D
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-foreground" data-bind="member.name">Dev</h3>
+                            <p class="text-sm text-muted-foreground">Team Lead & Developer</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Problem Statement</span>
+                            <div class="bg-secondary/10 text-secondary px-2 py-1 rounded text-xs font-medium">
+                                Submitted
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Tasks Assigned</span>
+                            <span class="text-sm font-medium">5</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Completed</span>
+                            <span class="text-sm font-medium">3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground font-semibold text-lg">
+                            K
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-foreground">Krisha</h3>
+                            <p class="text-sm text-muted-foreground">UI/UX Designer</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Problem Statement</span>
+                            <div class="bg-secondary/10 text-secondary px-2 py-1 rounded text-xs font-medium">
+                                Submitted
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Tasks Assigned</span>
+                            <span class="text-sm font-medium">4</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Completed</span>
+                            <span class="text-sm font-medium">2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center text-accent-foreground font-semibold text-lg">
+                            D
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-foreground">Dhruvi</h3>
+                            <p class="text-sm text-muted-foreground">Backend Developer</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Problem Statement</span>
+                            <div class="bg-accent/10 text-accent px-2 py-1 rounded text-xs font-medium">
+                                In Review
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Tasks Assigned</span>
+                            <span class="text-sm font-medium">3</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Completed</span>
+                            <span class="text-sm font-medium">1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg">
+                            K
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-foreground">Keval</h3>
+                            <p class="text-sm text-muted-foreground">Frontend Developer</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Problem Statement</span>
+                            <div class="bg-secondary/10 text-secondary px-2 py-1 rounded text-xs font-medium">
+                                Submitted
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Tasks Assigned</span>
+                            <span class="text-sm font-medium">6</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Completed</span>
+                            <span class="text-sm font-medium">4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground font-semibold text-lg">
+                            P
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-foreground">Param</h3>
+                            <p class="text-sm text-muted-foreground">Data Analyst</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Problem Statement</span>
+                            <div class="bg-muted text-muted-foreground px-2 py-1 rounded text-xs font-medium">
+                                Pending
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Tasks Assigned</span>
+                            <span class="text-sm font-medium">2</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Completed</span>
+                            <span class="text-sm font-medium">1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-muted rounded-full flex items-center justify-center text-muted-foreground font-semibold text-lg">
+                            ?
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-foreground">Mysterious</h3>
+                            <p class="text-sm text-muted-foreground">Role TBD</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Problem Statement</span>
+                            <div class="bg-muted text-muted-foreground px-2 py-1 rounded text-xs font-medium">
+                                Pending
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Tasks Assigned</span>
+                            <span class="text-sm font-medium">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Completed</span>
+                            <span class="text-sm font-medium">0</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: MemberCard -->
+            </div>
+        </section>
+
+        <!-- Tasks & File Upload Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Task Management -->
+            <section id="tasks">
+                <h2 class="text-2xl font-bold text-foreground mb-6">Current Tasks</h2>
+                
+                <div class="space-y-4">
+                    <!-- @MAP: tasks.map(task => ( -->
+                    <div class="bg-card p-4 rounded-lg border border-border">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-semibold text-foreground" data-bind="task.title">Problem Statement Research</h3>
+                                <p class="text-sm text-muted-foreground" data-bind="task.assignee">Assigned to: Dev, Krisha</p>
+                            </div>
+                            <div class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium">
+                                In Progress
+                            </div>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-3" data-bind="task.description">Research and identify key problem areas for our hackathon solution</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 text-xs text-muted-foreground">
+                                <i class="fas fa-calendar"></i>
+                                <span data-bind="task.dueDate">Due: Dec 28, 2024</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-muted rounded-full h-1">
+                                    <div class="bg-accent h-1 rounded-full w-3/4"></div>
+                                </div>
+                                <span class="text-xs text-muted-foreground">75%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card p-4 rounded-lg border border-border">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-semibold text-foreground">UI Wireframe Creation</h3>
+                                <p class="text-sm text-muted-foreground">Assigned to: Krisha</p>
+                            </div>
+                            <div class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-medium">
+                                Completed
+                            </div>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-3">Create initial wireframes for the user interface design</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 text-xs text-muted-foreground">
+                                <i class="fas fa-calendar"></i>
+                                <span>Due: Dec 25, 2024</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-muted rounded-full h-1">
+                                    <div class="bg-secondary h-1 rounded-full w-full"></div>
+                                </div>
+                                <span class="text-xs text-muted-foreground">100%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card p-4 rounded-lg border border-border">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-semibold text-foreground">Database Schema Design</h3>
+                                <p class="text-sm text-muted-foreground">Assigned to: Dhruvi, Keval</p>
+                            </div>
+                            <div class="bg-muted text-muted-foreground px-3 py-1 rounded-full text-xs font-medium">
+                                Pending
+                            </div>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-3">Design the database structure for the application</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 text-xs text-muted-foreground">
+                                <i class="fas fa-calendar"></i>
+                                <span>Due: Dec 30, 2024</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-muted rounded-full h-1">
+                                    <div class="bg-muted h-1 rounded-full w-0"></div>
+                                </div>
+                                <span class="text-xs text-muted-foreground">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+
+                <button class="w-full mt-4 border-2 border-dashed border-border rounded-lg p-4 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Add New Task
+                </button>
+            </section>
+
+            <!-- File Upload Section -->
+            <section id="uploads">
+                <h2 class="text-2xl font-bold text-foreground mb-6">Problem Statement Uploads</h2>
+                
+                <!-- @FUNCTIONALITY: This drag-and-drop area should handle file uploads with validation -->
+                <div class="border-2 border-dashed border-border rounded-lg p-8 text-center mb-6 hover:border-primary transition-colors" 
+                     data-implementation="Implement drag-and-drop file upload functionality">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-muted-foreground mb-4"></i>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Upload Problem Statement</h3>
+                    <p class="text-muted-foreground mb-4">Drag and drop your files here or click to browse</p>
+                    <button class="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                        Choose Files
+                    </button>
+                    <p class="text-xs text-muted-foreground mt-2">Supported formats: PDF, DOC, DOCX (Max 10MB)</p>
+                </div>
+
+                <!-- Uploaded Files List -->
+                <div class="space-y-3">
+                    <h3 class="font-semibold text-foreground">Recent Uploads</h3>
+                    
+                    <!-- @MAP: uploadedFiles.map(file => ( -->
+                    <div class="bg-card p-4 rounded-lg border border-border flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-foreground" data-bind="file.name">problem_statement_dev.pdf</h4>
+                                <p class="text-sm text-muted-foreground">
+                                    <span data-bind="file.uploader">Dev</span> • 
+                                    <span data-bind="file.size">2.3 MB</span> • 
+                                    <span data-bind="file.uploadTime">2 hours ago</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="p-2 text-muted-foreground hover:text-primary transition-colors">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="p-2 text-muted-foreground hover:text-destructive transition-colors">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-card p-4 rounded-lg border border-border flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-word text-secondary"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-foreground">problem_analysis_krisha.docx</h4>
+                                <p class="text-sm text-muted-foreground">
+                                    Krisha • 1.8 MB • 5 hours ago
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="p-2 text-muted-foreground hover:text-primary transition-colors">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="p-2 text-muted-foreground hover:text-destructive transition-colors">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-card p-4 rounded-lg border border-border flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-accent"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-foreground">market_research_keval.pdf</h4>
+                                <p class="text-sm text-muted-foreground">
+                                    Keval • 3.1 MB • 1 day ago
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="p-2 text-muted-foreground hover:text-primary transition-colors">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="p-2 text-muted-foreground hover:text-destructive transition-colors">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Upcoming Tasks Preview -->
+        <section class="mt-8 bg-muted/50 rounded-lg p-6">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-clock text-primary mr-3"></i>
+                <h2 class="text-xl font-bold text-foreground">Upcoming Phases</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-card p-4 rounded-lg border border-border">
+                    <h3 class="font-semibold text-foreground mb-2">Solution Development Phase</h3>
+                    <p class="text-sm text-muted-foreground mb-2">Technical implementation and prototype development</p>
+                    <div class="text-xs text-muted-foreground">
+                        <i class="fas fa-calendar mr-1"></i>
+                        Expected Start: Jan 2, 2025
+                    </div>
+                </div>
+                <div class="bg-card p-4 rounded-lg border border-border">
+                    <h3 class="font-semibold text-foreground mb-2">Testing & Refinement</h3>
+                    <p class="text-sm text-muted-foreground mb-2">Quality assurance and final adjustments</p>
+                    <div class="text-xs text-muted-foreground">
+                        <i class="fas fa-calendar mr-1"></i>
+                        Expected Start: Jan 15, 2025
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        (() => {
+            // Drag and drop functionality for file uploads
+            const dropZone = document.querySelector('[data-implementation*="drag-and-drop"]');
+            
+            if (dropZone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, highlight, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, unhighlight, false);
+                });
+                
+                dropZone.addEventListener('drop', handleDrop, false);
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                function highlight(e) {
+                    dropZone.classList.add('drag-over');
+                }
+                
+                function unhighlight(e) {
+                    dropZone.classList.remove('drag-over');
+                }
+                
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    
+                    // TODO: Handle file upload to server
+                    console.log('Files to upload:', files);
+                }
+            }
+
+            // Mobile menu toggle
+            const mobileMenuButton = document.querySelector('.md\\:hidden button');
+            const nav = document.querySelector('nav');
+            
+            if (mobileMenuButton && nav) {
+                mobileMenuButton.addEventListener('click', () => {
+                    // TODO: Implement mobile menu toggle
+                    console.log('Toggle mobile menu');
+                });
+            }
+
+            // Task status updates
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('[data-event*="click"]')) {
+                    // TODO: Handle task status updates
+                    console.log('Task status update requested');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
