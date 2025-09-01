@@ -20,6 +20,7 @@ import TaskCard from "@/components/task-card";
 import FileUpload from "@/components/file-upload";
 import ActivityFeed from "@/components/activity-feed";
 import StatsCard from "@/components/stats-card";
+import BackgroundAnimation from "@/components/background-animation";
 import { z } from "zod";
 
 const taskFormSchema = insertTaskSchema.extend({
@@ -149,11 +150,12 @@ export default function Dashboard() {
 
   return (
     <motion.div 
-      className="min-h-screen bg-background"
+      className="min-h-screen bg-background relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      <BackgroundAnimation />
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

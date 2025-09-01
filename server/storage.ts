@@ -42,7 +42,7 @@ export class MemStorage implements IStorage {
       { name: "Dhruvi", role: "", avatar: "D", color: "accent" },
       { name: "Keval", role: "", avatar: "K", color: "primary" },
       { name: "Param", role: "", avatar: "P", color: "secondary" },
-      { name: "Mysterious", role: "", avatar: "?", color: "muted" },
+      { name: "Vivek", role: "", avatar: "V", color: "muted" },
     ];
 
     members.forEach(member => {
